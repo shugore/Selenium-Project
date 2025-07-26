@@ -1,0 +1,11 @@
+{
+  "browser": "chrome",
+  "reg": {
+    "environmentName": "Regression",
+    "backend": {
+      "url": "www.automation.com",
+      "username": "automation@gmail.com",
+      "password": "123456"
+    }
+  }
+}
