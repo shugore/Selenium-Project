@@ -13,13 +13,13 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.devtools.v136.page.model.Screenshot;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.safari.SafariDriver;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeSuite;
 
 import java.io.*;
@@ -37,59 +37,59 @@ public class BaseClass {
     public static ExtentTest loggerTest;
     private String suiteName;
 
-    private void init_properties(){
+    private void init_properties() {
 
-         prop = new Properties();
+        prop = new Properties();
 
-         try {
+        try {
 
-             BufferedReader reader = new BufferedReader(new FileReader(new File("./src/test/java/com/automation/utilities/config.json")));
-             StringBuilder builder = new StringBuilder();
-             String line = null;
-             while ((line = reader.readLine()) != null){
-                 builder.append(line);
-             }
-             JSONObject mainJson = new JSONObject(builder.toString());
-             HashMap<String,String> propMap = new HashMap<>();
+            BufferedReader reader = new BufferedReader(new FileReader(new File("./src/test/java/com/automation/utilities/config.json")));
+            StringBuilder builder = new StringBuilder();
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                builder.append(line);
+            }
+            JSONObject mainJson = new JSONObject(builder.toString());
+            HashMap<String, String> propMap = new HashMap<>();
 
-             List<String> otherKeys = Arrays.asList("browser","accessCode");
-             for (String key : mainJson.keySet()){
-                 if (key != null && !key.isEmpty()){
+            List<String> otherKeys = Arrays.asList("browser", "accessCode");
+            for (String key : mainJson.keySet()) {
+                if (key != null && !key.isEmpty()) {
 
-                     if (key.equalsIgnoreCase(environment)){
-                         String backUrl = mainJson.getJSONObject(key).getJSONObject("backend").getString("url");
-                         propMap.put("backendUrl",backUrl);
+                    if (key.equalsIgnoreCase(environment)) {
+                        String backUrl = mainJson.getJSONObject(key).getJSONObject("backend").getString("url");
+                        propMap.put("backendUrl", backUrl);
 
-                         String userName = mainJson.getJSONObject(key).getJSONObject("backend").getString("username");
-                         propMap.put("username",userName);
+                        String userName = mainJson.getJSONObject(key).getJSONObject("backend").getString("username");
+                        propMap.put("username", userName);
 
-                         String password = mainJson.getJSONObject(key).getJSONObject("backend").getString("password");
-                         propMap.put("password",password);
+                        String password = mainJson.getJSONObject(key).getJSONObject("backend").getString("password");
+                        propMap.put("password", password);
 
-                         String envName = mainJson.getJSONObject(key).getString("environmentName");
-                         propMap.put("getEnv",envName);
+                        String envName = mainJson.getJSONObject(key).getString("environmentName");
+                        propMap.put("getEnv", envName);
 
-                     } else if (otherKeys.contains(key)) {
-                         propMap.put(key, mainJson.getString(key));
-                     }
-                 }
-             }
-             prop.putAll(propMap);
-             System.out.println("Prop = "+ prop);
+                    } else if (otherKeys.contains(key)) {
+                        propMap.put(key, mainJson.getString(key));
+                    }
+                }
+            }
+            prop.putAll(propMap);
+            System.out.println("Prop = " + prop);
 
-         } catch (FileNotFoundException e) {
-             System.out.println("Config file not found!");
-             e.printStackTrace();
-         }catch (IOException e) {
-             System.out.println("Failed to load properties file!");
-             e.printStackTrace();
-         }
+        } catch (FileNotFoundException e) {
+            System.out.println("Config file not found!");
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("Failed to load properties file!");
+            e.printStackTrace();
+        }
     }
 
-    public WebDriver setUp(){
+    public WebDriver setUp() {
         String browser = prop.getProperty("browser");
 
-        if (browser.equalsIgnoreCase("chrome")){
+        if (browser.equalsIgnoreCase("chrome")) {
 
             driver = new ChromeDriver();
 
@@ -104,14 +104,14 @@ public class BaseClass {
         } else if (browser.equalsIgnoreCase("safari")) {
             driver = new SafariDriver();
 
-        }else {
+        } else {
             System.out.println("Please provide proper browser name...");
         }
 
         return driver;
     }
 
-    public static String dateTimeFolder(Date date){
+    public static String dateTimeFolder(Date date) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH-mm-ss-SSS");
 
@@ -119,8 +119,8 @@ public class BaseClass {
 
     }
 
-    @BeforeSuite(alwaysRun = true )
-    public void beforeSuiteMethod()  {
+    @BeforeSuite(alwaysRun = true)
+    public void beforeSuiteMethod() {
 
         init_properties();
 
@@ -131,7 +131,7 @@ public class BaseClass {
 
         currentReportFolderName = dateTimeFolder(d);
 
-        ExtentSparkReporter sparkReporter = new ExtentSparkReporter(new File(System.getProperty("user.dir") + "/Reports/" + currentReportFolderName +"/" + fileName));
+        ExtentSparkReporter sparkReporter = new ExtentSparkReporter(new File(System.getProperty("user.dir") + "/Reports/" + currentReportFolderName + "/" + fileName));
         sparkReporter.config().enableOfflineMode(true);
         sparkReporter.config().setTheme(Theme.DARK);
         sparkReporter.config().setDocumentTitle(fileName);
@@ -142,12 +142,17 @@ public class BaseClass {
         reports = new ExtentReports();
         reports.attachReporter(sparkReporter);
 
-        reports.setSystemInfo("Organization","Automation Test Solutions");
-        reports.setSystemInfo("Project","Selenium With Java");
+        reports.setSystemInfo("Organization", "Automation Test Solutions");
+        reports.setSystemInfo("Project", "Selenium With Java");
         reports.setSystemInfo("Environment", prop.getProperty("getEnv"));
-        reports.setSystemInfo("Test-Suite",suiteName);
+        reports.setSystemInfo("Test-Suite", suiteName);
         reports.setSystemInfo("Url", prop.getProperty("backendUrl"));
 
+    }
+
+    @BeforeClass(alwaysRun = true)
+    public void beforeClassMethod() {
+        setUp();
     }
 
     public static String extentReportScreenshot(WebDriver driver, String screenshotName) throws IOException {
@@ -160,7 +165,7 @@ public class BaseClass {
         String destination = destinationFolder + screenshotName + dateName + ".png";
         File destinationFolderFile = new File(destinationFolder);
 
-        if (!destinationFolderFile.exists()){
+        if (!destinationFolderFile.exists()) {
             destinationFolderFile.mkdir();
         }
         File finalDestinationFile = new File(destination);
@@ -170,14 +175,14 @@ public class BaseClass {
     }
 
     @AfterMethod(alwaysRun = true)
-    public void tearDown_AM(ITestResult result){
+    public void getResultsAfterExecution(ITestResult result) {
 
         try {
-            if (result.getStatus() == ITestResult.FAILURE){
+            if (result.getStatus() == ITestResult.FAILURE) {
 
-                loggerTest.log(Status.FAIL,"Test Case Failed Is " + result.getThrowable());
+                loggerTest.log(Status.FAIL, "Test Case Failed Is " + result.getThrowable());
                 try {
-                    String screenshotPath = BaseClass.extentReportScreenshot(driver,result.getName());
+                    String screenshotPath = BaseClass.extentReportScreenshot(driver, result.getName());
                     loggerTest.log(Status.FAIL, ("<b>" + "<font colour=" + "red>" + "Screenshot of failure" + "</font" + "</b>"));
                     loggerTest.addScreenCaptureFromPath(screenshotPath);
                 } catch (IOException e) {
@@ -186,41 +191,41 @@ public class BaseClass {
                 String methodName = result.getMethod().getMethodName();
                 String failedText = "Test Case Failed:- " + methodName;
                 Markup F = MarkupHelper.createLabel(failedText, ExtentColor.RED);
-                loggerTest.log(Status.FAIL,F);
+                loggerTest.log(Status.FAIL, F);
 
             } else if (result.getStatus() == ITestResult.SUCCESS) {
 
                 String methodName = result.getMethod().getMethodName();
                 String failedText = "Test Case:- " + methodName + "Passed.";
                 Markup F = MarkupHelper.createLabel(failedText, ExtentColor.GREEN);
-                loggerTest.log(Status.PASS,F);
+                loggerTest.log(Status.PASS, F);
 
             } else if (result.getStatus() == ITestResult.SKIP) {
 
                 String methodName = result.getMethod().getMethodName();
                 String failedText = "Test Case:- " + methodName + "Skipped.";
                 Markup F = MarkupHelper.createLabel(failedText, ExtentColor.GREY);
-                loggerTest.log(Status.SKIP,F);
+                loggerTest.log(Status.SKIP, F);
             }
 
             reports.flush();
 
         } catch (Throwable e) {
-            if(loggerTest != null){
+            if (loggerTest != null) {
                 throw new RuntimeException(e);
             }
         }
     }
 
     @AfterClass(alwaysRun = true)
-    public void tearDown(){
+    public void tearDown() {
 
-        if(driver != null){
+        if (driver != null) {
             driver.quit();
         }
     }
 
-    public void printLogs(String log){
+    public void printLogs(String log) {
         System.out.println(log);
         loggerTest.pass(log);
     }

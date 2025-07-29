@@ -3,7 +3,7 @@
   "reg": {
     "environmentName": "Regression",
     "backend": {
-      "url": "www.automation.com",
+      "url": "https://demo.automationtesting.in/",
       "username": "automation@gmail.com",
       "password": "123456"
     }
